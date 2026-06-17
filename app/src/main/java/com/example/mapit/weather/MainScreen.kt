@@ -8,6 +8,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cloud
@@ -19,6 +22,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -41,8 +45,9 @@ fun MainScreen(viewModel: WeatherViewModel = viewModel()) {
     var selectedDay by remember { mutableStateOf<DailyForecast?>(null) }
     var showMap by remember { mutableStateOf(false) }
 
+    // Theme Colors for "Black/Grey/Dark Vibe"
     val backgroundGradient = Brush.verticalGradient(
-        colors = listOf(Color(0xFF0F172A), Color(0xFF1E293B))
+        colors = listOf(Color(0xFF000000), Color(0xFF121212))
     )
 
     Box(
@@ -64,7 +69,7 @@ fun MainScreen(viewModel: WeatherViewModel = viewModel()) {
             when {
                 state.isLoading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = Color.Cyan)
+                        CircularProgressIndicator(color = Color.White)
                     }
                 }
                 state.error != null -> {
@@ -78,6 +83,7 @@ fun MainScreen(viewModel: WeatherViewModel = viewModel()) {
                             .padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
+                        // Header
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -86,7 +92,7 @@ fun MainScreen(viewModel: WeatherViewModel = viewModel()) {
                             Column {
                                 Text(
                                     text = "MapIt Weather",
-                                    color = Color.White.copy(alpha = 0.7f),
+                                    color = Color.White.copy(alpha = 0.5f),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -94,7 +100,7 @@ fun MainScreen(viewModel: WeatherViewModel = viewModel()) {
                                     Icon(
                                         Icons.Default.LocationOn,
                                         contentDescription = null,
-                                        tint = Color.Cyan,
+                                        tint = Color.LightGray,
                                         modifier = Modifier.size(14.dp)
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
@@ -106,51 +112,43 @@ fun MainScreen(viewModel: WeatherViewModel = viewModel()) {
                                 }
                             }
                             IconButton(onClick = { showMap = true }) {
-                                Icon(Icons.Default.Map, contentDescription = "Select Location", tint = Color.Cyan)
+                                Icon(Icons.Default.Map, contentDescription = "Select Location", tint = Color.White)
                             }
                         }
 
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        WeatherAnimation(state.current)
+                        // SLIDER SCREEN (PAGER)
+                        val pagerState = rememberPagerState(pageCount = { 3 })
+                        
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            HorizontalPager(
+                                state = pagerState,
+                                modifier = Modifier.height(380.dp)
+                            ) { page ->
+                                when (page) {
+                                    0 -> CurrentWeatherPage(state)
+                                    1 -> ForecastPage(state) { selectedDay = it }
+                                    2 -> OtherInfoPage(state)
+                                }
+                            }
 
-                        Text(
-                            text = "${state.temp}°",
-                            color = Color.White,
-                            fontSize = 72.sp,
-                            fontWeight = FontWeight.Thin
-                        )
-
-                        Text(
-                            text = state.current.uppercase(),
-                            color = Color.Cyan,
-                            fontSize = 16.sp,
-                            letterSpacing = 4.sp,
-                            fontWeight = FontWeight.Light
-                        )
-
-                        Spacer(modifier = Modifier.height(32.dp))
-
-                        WeatherDetailCard(state)
-
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        Text(
-                            text = "Daily Forecast (Tap to add note)",
-                            color = Color.White,
-                            modifier = Modifier.align(Alignment.Start).padding(bottom = 8.dp),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
-                        )
-
-                        LazyColumn(
-                            modifier = Modifier.fillMaxWidth().weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            contentPadding = PaddingValues(bottom = 16.dp)
-                        ) {
-                            items(state.dailyForecast) { forecast ->
-                                ForecastItem(forecast) {
-                                    selectedDay = forecast
+                            // Pager Indicators
+                            Row(
+                                Modifier
+                                    .height(50.dp)
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                repeat(3) { iteration ->
+                                    val color = if (pagerState.currentPage == iteration) Color.White else Color.DarkGray
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(2.dp)
+                                            .clip(CircleShape)
+                                            .background(color)
+                                            .size(6.dp)
+                                    )
                                 }
                             }
                         }
@@ -170,6 +168,91 @@ fun MainScreen(viewModel: WeatherViewModel = viewModel()) {
                 }
             )
         }
+    }
+}
+
+@Composable
+fun CurrentWeatherPage(state: WeatherState) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        WeatherAnimation(state.current)
+
+        Text(
+            text = "${state.temp}°",
+            color = Color.White,
+            fontSize = 80.sp,
+            fontWeight = FontWeight.ExtraLight
+        )
+
+        Text(
+            text = state.current.uppercase(),
+            color = Color.LightGray,
+            fontSize = 16.sp,
+            letterSpacing = 6.sp,
+            fontWeight = FontWeight.Light
+        )
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        WeatherDetailCard(state)
+    }
+}
+
+@Composable
+fun ForecastPage(state: WeatherState, onDayClick: (DailyForecast) -> Unit) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Text(
+            text = "Forecast",
+            color = Color.White.copy(0.7f),
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(state.dailyForecast) { forecast ->
+                ForecastItem(forecast) { onDayClick(forecast) }
+            }
+        }
+    }
+}
+
+@Composable
+fun OtherInfoPage(state: WeatherState) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Statistics",
+            color = Color.White.copy(0.7f),
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            modifier = Modifier.padding(bottom = 24.dp)
+        )
+        
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
+        ) {
+            Column(modifier = Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                DetailRow("Feels Like", state.feelsLike)
+                DetailRow("Pressure", state.pressure)
+                DetailRow("Humidity", state.humidity)
+                DetailRow("Wind", state.wind)
+            }
+        }
+    }
+}
+
+@Composable
+fun DetailRow(label: String, value: String) {
+    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Text(label, color = Color.Gray)
+        Text(value, color = Color.White, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -194,36 +277,28 @@ fun MapPicker(
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            onMapClick = {
-                selectedLocation = it
-            }
+            onMapClick = { selectedLocation = it }
         ) {
-            Marker(
-                state = markerState,
-                title = "Selected Location"
-            )
+            Marker(state = markerState, title = "Selected Location")
         }
 
         Column(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(24.dp)
-                .background(Color(0xFF1E293B).copy(alpha = 0.9f), RoundedCornerShape(16.dp))
+                .background(Color(0xFF121212), RoundedCornerShape(16.dp))
                 .padding(16.dp)
         ) {
             Button(
                 onClick = { onLocationSelected(selectedLocation.latitude, selectedLocation.longitude) },
                 modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan, contentColor = Color.Black)
+                colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)
             ) {
                 Text("Confirm Location")
             }
             Spacer(modifier = Modifier.height(8.dp))
-            TextButton(
-                onClick = onClose,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Cancel", color = Color.White.copy(alpha = 0.6f))
+            TextButton(onClick = onClose, modifier = Modifier.fillMaxWidth()) {
+                Text("Cancel", color = Color.Gray)
             }
         }
     }
@@ -231,81 +306,62 @@ fun MapPicker(
 
 @Composable
 fun WeatherAnimation(condition: String) {
+    val isSunny = condition.contains("Sunny", true)
     val infiniteTransition = rememberInfiniteTransition(label = "weather")
-    val alpha by infiniteTransition.animateFloat(
-        initialValue = 0.6f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ), label = "alpha"
+    
+    val rotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(tween(20000, easing = LinearEasing)),
+        label = "rotation"
     )
 
     val scale by infiniteTransition.animateFloat(
         initialValue = 0.95f,
         targetValue = 1.05f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(3000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ), label = "scale"
+        animationSpec = infiniteRepeatable(tween(4000), RepeatMode.Reverse),
+        label = "scale"
     )
 
-    Box(
+    Icon(
+        imageVector = if (isSunny) Icons.Default.WbSunny else Icons.Default.Cloud,
+        contentDescription = null,
         modifier = Modifier
-            .size(140.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector = if (condition.contains("Sunny", true)) Icons.Default.WbSunny else Icons.Default.Cloud,
-            contentDescription = null,
-            modifier = Modifier
-                .size(100.dp)
-                .graphicsLayer(alpha = alpha, scaleX = scale, scaleY = scale),
-            tint = if (condition.contains("Sunny", true)) Color(0xFFFFD700) else Color.LightGray
-        )
-    }
+            .size(100.dp)
+            .graphicsLayer(
+                scaleX = scale, 
+                scaleY = scale,
+                rotationZ = if (isSunny) rotation else 0f
+            ),
+        tint = Color.White.copy(alpha = 0.9f)
+    )
 }
 
 @Composable
 fun ForecastItem(forecast: DailyForecast, onClick: () -> Unit) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.05f)),
-        shape = RoundedCornerShape(16.dp)
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF121212)),
+        shape = RoundedCornerShape(12.dp)
     ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(16.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = forecast.day, color = Color.White, fontWeight = FontWeight.Bold)
                 if (forecast.note.isNotEmpty()) {
-                    Text(
-                        text = forecast.note,
-                        color = Color.Cyan.copy(alpha = 0.8f),
-                        fontSize = 12.sp,
-                        maxLines = 1
-                    )
+                    Text(text = forecast.note, color = Color.LightGray, fontSize = 12.sp, maxLines = 1)
                 } else {
-                    Text(text = forecast.condition, color = Color.White.copy(alpha = 0.5f), fontSize = 12.sp)
+                    Text(text = forecast.condition, color = Color.Gray, fontSize = 12.sp)
                 }
             }
-            
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (forecast.note.isNotEmpty()) {
-                    Icon(
-                        imageVector = Icons.Default.Info,
-                        contentDescription = null,
-                        tint = Color.Cyan,
-                        modifier = Modifier.size(14.dp).padding(end = 4.dp)
-                    )
+                    Icon(Icons.Default.Info, null, tint = Color.Gray, modifier = Modifier.size(14.dp).padding(end = 4.dp))
                 }
-                Text(text = "${forecast.temp}°", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                Text(text = "${forecast.temp}°", color = Color.White, fontSize = 18.sp)
             }
         }
     }
@@ -318,33 +374,28 @@ fun NoteEditDialog(forecast: DailyForecast, onDismiss: () -> Unit, onSave: (Stri
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Note for ${forecast.day}", color = Color.White) },
-        containerColor = Color(0xFF1E293B),
+        containerColor = Color(0xFF121212),
         text = {
             OutlinedTextField(
                 value = text,
                 onValueChange = { text = it },
-                label = { Text("What's happening?") },
+                label = { Text("Add Note", color = Color.Gray) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.White,
                     unfocusedTextColor = Color.White,
-                    focusedBorderColor = Color.Cyan,
-                    unfocusedBorderColor = Color.White.copy(alpha = 0.3f)
+                    focusedBorderColor = Color.White,
+                    unfocusedBorderColor = Color.Gray
                 )
             )
         },
         confirmButton = {
-            Button(
-                onClick = { onSave(forecast.day, text) },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan, contentColor = Color.Black)
-            ) {
+            Button(onClick = { onSave(forecast.day, text) }, colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black)) {
                 Text("Save")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel", color = Color.White.copy(alpha = 0.7f))
-            }
+            TextButton(onClick = onDismiss) { Text("Cancel", color = Color.Gray) }
         }
     )
 }
@@ -356,19 +407,10 @@ fun ErrorPlaceholder(error: String) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.weathersnow),
-            contentDescription = "App Logo",
-            modifier = Modifier.size(120.dp)
-        )
+        Image(painter = painterResource(id = R.drawable.weathersnow), contentDescription = "Logo", modifier = Modifier.size(120.dp))
         Spacer(modifier = Modifier.height(16.dp))
-        Text(text = "Oops! Something went wrong", color = Color.White, fontWeight = FontWeight.Bold)
-        Text(
-            text = error,
-            color = Color.White.copy(alpha = 0.5f),
-            fontSize = 12.sp,
-            modifier = Modifier.padding(horizontal = 32.dp)
-        )
+        Text(text = "Something went wrong", color = Color.White)
+        Text(text = error, color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(horizontal = 32.dp))
     }
 }
 
@@ -377,14 +419,10 @@ fun WeatherDetailCard(state: WeatherState) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.08f)
-        )
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF121212))
     ) {
         Row(
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.padding(20.dp).fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             WeatherStat("Humidity", state.humidity)
@@ -397,7 +435,7 @@ fun WeatherDetailCard(state: WeatherState) {
 @Composable
 fun WeatherStat(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = label, color = Color.White.copy(alpha = 0.5f), fontSize = 11.sp)
+        Text(text = label, color = Color.Gray, fontSize = 11.sp)
         Text(text = value, color = Color.White, fontSize = 15.sp, fontWeight = FontWeight.Bold)
     }
 }
