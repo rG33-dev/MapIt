@@ -85,7 +85,7 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.2.0")
 
     // Pager (Foundation)
-    implementation("androidx.compose.foundation:foundation:1.10.2")
+    implementation("androidx.compose.foundation:foundation")
 
     // Icons
     implementation("androidx.compose.material:material-icons-extended")
@@ -103,6 +103,11 @@ dependencies {
     // Maps
     implementation(libs.maps.compose)
     implementation(libs.play.services.maps)
+
+    // Networking - Added Retrofit for API
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 }
 
 configurations.all {

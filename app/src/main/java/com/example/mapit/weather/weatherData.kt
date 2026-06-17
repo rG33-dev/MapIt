@@ -18,7 +18,9 @@ data class WeatherState(
     val dailyForecast: List<DailyForecast> = emptyList(),
     val latitude: Double = 37.7749, // Default to SF
     val longitude: Double = -122.4194,
-    val locationName: String = "San Francisco"
+    val locationName: String = "San Francisco",
+    val pressure: String = "--",
+    val feelsLike: String = "--"
 )
 
 data class DailyForecast(
