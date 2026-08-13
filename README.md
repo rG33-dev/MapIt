@@ -1,41 +1,123 @@
-# MapIt Weather
+# MapIt 🗺️
 
-MapIt is a modern weather companion designed for those who appreciate a minimalist, high-contrast aesthetic. Built with a focus on precision and user interaction, it blends real-time meteorological data with an intuitive map-driven experience, all wrapped in a sleek, monochrome dark vibe that is as easy on the eyes as it is functional.
+MapIt is a modern Android mapping application built with Kotlin and Jetpack Compose, focused on interactive maps, real-time location updates, and location-based points of interest.
 
-## The Vision
+The project explores practical implementation of Google Maps integration, location services, runtime permissions, network-state handling, and responsive map-based UI.
 
-The philosophy behind MapIt is simple: weather should be informative but never overwhelming. By utilizing a deep black and slate-grey palette, the app eliminates visual noise, allowing critical weather data and sleek animations to take center stage. Whether you are checking your local forecast or scouting the weather for a trip halfway across the globe, MapIt provides a consistent, premium experience.
+<img width="1280" height="853" alt="photo_2026-08-13_17-09-51" src="https://github.com/user-attachments/assets/f35da109-8c76-4fa1-b3af-fd7cb798d002" />
 
-## Feature Highlights
 
-Live Interactive Mapping
-The core of the experience starts with a full-screen Google Maps integration. Instead of typing city names, users can simply navigate the globe and drop a pin anywhere to instantly fetch localized weather data.
+## ✨ Features
 
-Three-Page Information Slider
-Data is organized into a fluid, swipable pager that divides information into digestible bites. The first screen offers a snapshot of current conditions with pulsing monochrome animations. The second screen provides a detailed five-day forecast. The third screen dives into technical statistics like atmospheric pressure and wind speed.
+- 🗺️ Interactive Google Maps
+  - Integrated Google Maps into a Jetpack Compose-based Android application.
+  - Provides an interactive map experience with map controls and location-based content.
 
-Personalized Weather Notes
-MapIt goes beyond numbers by allowing you to add personal context to your forecast. You can tap on any upcoming day in the forecast slider to write a quick note, such as a reminder to bring an umbrella for a meeting or a plan for a weekend hike.
+- 📍 Real-Time Location
+  - Retrieves and updates the user's location in real time.
+  - Handles location access through Android runtime permissions.
 
-Minimalist Motion Design
-To maintain the dark vibe, the app features custom-built animations for sun and cloud states. These subtle rotations and scaling effects provide a living feel to the interface without being a distraction.
+- 📌 Map Markers & POIs
+  - Displays location-based markers and points of interest on the map.
+  - Supports dynamic map content based on location data.
 
-## Application Flow
+- 🌐 Network Awareness
+  - Monitors connectivity and network state.
+  - Handles application behavior based on network availability.
 
-When you first open MapIt, you are greeted with the current weather for your last selected location. The interface is optimized for thumb navigation, allowing you to swipe horizontally to transition from the current conditions to the extended forecast and then to the detailed statistics page. If you need to check the weather elsewhere, a quick tap on the map icon opens the globe. Once you select a new point and confirm, the entire app state refreshes with fresh data from the OpenWeatherMap API.
+- 🎨 Responsive UI
+  - Built using Jetpack Compose.
+  - Uses modern Android UI development practices for a responsive map-based interface.
 
-## Technical Foundation
+---
 
-MapIt is built on a modern Android stack using Jetpack Compose for its entirely declarative UI. Under the hood, it leverages Retrofit for clean network requests and a robust ViewModel-driven architecture that ensures data consistency even as you navigate between the map and the main dashboard.
+## 🛠️ Tech Stack
 
-## Visual Preview
+| Category | Technologies |
+|----------|-------------|
+| Language | Kotlin |
+| Platform | Android |
+| UI | Jetpack Compose |
+| Maps | Google Maps SDK |
+| Location | Android Location APIs |
+| Architecture | Modern Android Architecture |
+| Permissions | Android Runtime Permissions |
+| Networking | Network / Connectivity APIs |
+| Build | Gradle |
+| IDE | Android Studio |
 
-Place for Demo GIF
-(Insert a screen recording here showing the pager swipe and map selection)
+---
 
-Screenshots
-(Insert high-quality screenshots of the Current Weather, Map Picker, and Forecast Note Dialog)
+## 🏗️ Architecture & Development
 
-## Getting Started
+MapIt follows modern Android development practices with a focus on maintainable application structure and lifecycle-aware components.
 
-To get this project running on your local machine, you will need to add your own API keys. Ensure you have a valid Google Maps SDK key in your AndroidManifest and an OpenWeatherMap API key in the WeatherViewModel. Once those are in place, the project is ready to be built and deployed to any modern Android device.
+Key implementation areas include:
+
+- Jetpack Compose UI
+- Google Maps integration
+- Real-time location updates
+- Runtime location permissions
+- Map markers and POI management
+- Network connectivity awareness
+- Lifecycle-aware location handling
+- Responsive map-based UI
+
+---
+
+## 🗺️ Google Maps Integration
+
+The application integrates the Google Maps SDK to provide an interactive map experience.
+
+MapIt uses the map to:
+
+- Display the user's location
+- Render map markers
+- Display points of interest
+- Respond to location updates
+- Provide an interactive map interface
+
+---
+
+## 📍 Location Handling
+
+MapIt implements real-time location functionality using Android location services.
+
+The application handles:
+
+1. Location permission requests
+2. Permission state changes
+3. Location updates
+4. Location-based UI updates
+5. Map positioning based on the user's location
+
+Location access is requested through Android's runtime permission system rather than assuming permission is available.
+
+---
+
+## 🌐 Network & Connectivity
+
+Map-based functionality can depend on network availability, so MapIt includes connectivity and network-state awareness.
+
+This allows the application to detect network changes and adapt its behavior accordingly.
+
+---
+
+
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Android Studio
+- Android SDK
+- Kotlin
+- Gradle
+- Android device or emulator
+- Google Maps API key
+
+### Clone the Repository
+
+`bash
+git clone <your-repository-url>
+cd MapIt
